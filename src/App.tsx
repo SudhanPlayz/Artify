@@ -12,8 +12,7 @@ const ctx = canvas.getContext("2d");
 
 //Write some cool code
 ctx.fillStyle = "white";
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-`);
+ctx.fillRect(0, 0, canvas.width, canvas.height);`);
   const [visible, setVisible] = React.useState(true)
   const [width, setWidth] = React.useState(300)
   const [height, setHeight] = React.useState(300)
