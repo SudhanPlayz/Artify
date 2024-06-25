@@ -1,62 +1,55 @@
 import React from 'react';
-import Editor from 'react-simple-code-editor';
-//@ts-ignore
-import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/themes/prism-okaidia.css';
+import Editor from '@monaco-editor/react';
 
 function App() {
-  const [code, setCode] = React.useState(`const canvas = document.querySelector("canvas");
+  const [code, setCode] = React.useState(`const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 //Write some cool code
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);`);
-  const [visible, setVisible] = React.useState(true)
   const [width, setWidth] = React.useState(300)
   const [height, setHeight] = React.useState(300)
 
-  React.useEffect(() => {
+  const run = () => {
     try {
       // eslint-disable-next-line
       eval(`(async () => {
-  ${code}
+        try{
+          ${code}
+        }
+        catch(err){
+          console.error(err)
+        }
 })()`)
     } catch (err) {
       console.error(err)
     }
-  }, [code, visible])
+  }
 
   return (
     <div className="flex flex-row w-screen h-screen bg-gray-950 relative">
-      <div className={"absolute flex flex-row w-screen h-screen justify-center items-center bg-gray-950" + (visible ? "" : " hidden")} style={{
-        zIndex: 999
-      }}>
-        <div className="flex flex-col w-1/3 h-1/2 bg-gray-800 rounded-lg text-white p-5">
-          <div className="text-3xl text-center">Enter canvas size</div>
-          <div className="flex flex-row mt-7"><div className="text-lg">Height:&nbsp;</div><input type="number" className="outline-none grow bg-gray-700 text-white pl-3 rounded-lg" onChange={(e) => setHeight(parseInt(e.target.value))} /></div>
-          <div className="flex flex-row mt-7"><div className="text-lg">Width:&nbsp;</div><input type="number" className="outline-none grow bg-gray-700 text-white pl-3 rounded-lg" onChange={(e) => setWidth(parseInt(e.target.value))} /></div>
-          <div className="grow flex flex-row justify-center items-center">
-            <div className="bg-green-700 rounded-lg p-3 cursor-pointer" onClick={() => setVisible(!visible)}>
-              Create Canvas
-            </div>
-          </div>
-        </div>
-      </div>
       <Editor
         value={code}
-        onValueChange={code => setCode(code)}
-        highlight={code => highlight(code, languages.js)}
-        padding={10}
-        style={{
-          width: "50%",
-          height: "100%",
-          color: "#ffffff"
-        }}
+        defaultLanguage='javascript'
+        onChange={(value) => setCode(value ?? "")}
+        width={"50%"}
+        height={"100%"}
+        theme="vs-dark"
       />
-      <div className="w-1/2 h-full flex flex-row justify-center items-center">
-        <canvas height={height} width={width} />
+      <div className="relative w-1/2 h-full flex flex-col justify-center items-center">
+        <canvas id='canvas' height={height} width={width} />
+        <div className="absolute flex flex-row bottom-0 justify-evenly p-10 w-full">
+          <div className="flex flex-col items-center text-white text-center">
+            <label>Width</label>
+            <input className='text-black appearance-none rounded-sm outline-none text-center' type="number" value={width} onChange={(e) => setWidth(parseInt(e.target.value))} />
+          </div>
+          <div className="flex flex-col items-center text-white text-center">
+            <label>Height</label>
+            <input className='text-black appearance-none rounded-sm outline-none text-center' type="number" value={height} onChange={(e) => setHeight(parseInt(e.target.value))} />
+          </div>
+          <button onClick={run} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">Run</button>
+        </div>
       </div>
     </div>
   );
